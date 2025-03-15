@@ -1715,7 +1715,7 @@ class cocos2d::CCDirector : cocos2d::CCObject, cocos2d::TypeInfo {
     int getSmoothFixCounter() const;
     unsigned int getTotalFrames();
     cocos2d::CCPoint getVisibleOrigin();
-    cocos2d::CCSize getVisibleSize();
+    cocos2d::CCSize getVisibleSize() = m1 0x3dfed0, imac 0x4710c0;
     cocos2d::CCSize getWinSize() = imac 0x470920, m1 0x3df874;
     cocos2d::CCSize getWinSizeInPixels() = imac 0x471080, m1 0x3dfeb4;
     float getZEye();
@@ -2326,7 +2326,7 @@ class cocos2d::CCTransitionScene : cocos2d::CCScene {
 
 [[link(win, android)]]
 class cocos2d::CCTransitionCrossFade : cocos2d::CCTransitionScene {
-	static cocos2d::CCTransitionCrossFade* create(float, cocos2d::CCScene*) = imac 0xd9450;
+	static cocos2d::CCTransitionCrossFade* create(float, cocos2d::CCScene*) = m1 0xc15c8, imac 0xd9450;
 
 	// CCTransitionCrossFade(cocos2d::CCTransitionCrossFade const&);
 	// CCTransitionCrossFade();
@@ -3067,11 +3067,11 @@ class cocos2d::CCSpriteFrameCache : cocos2d::CCObject {
     void addSpriteFramesWithFile(char const*) = imac 0x308940, m1 0x29f998;
     void addSpriteFramesWithFile(char const*, cocos2d::CCTexture2D*) = m1 0x29f8e0, imac 0x308890;
     void removeSpriteFrameByName(char const*) = m1 0x2a0020, imac 0x308e80;
-    void removeSpriteFrames();
-    void removeSpriteFramesFromDictionary(cocos2d::CCDictionary*);
-    void removeSpriteFramesFromFile(char const*);
-    void removeSpriteFramesFromTexture(cocos2d::CCTexture2D*) = imac 0x3095d0;
-    void removeUnusedSpriteFrames() = imac 0x308df0;
+    void removeSpriteFrames() = m1 0x29ff44, imac 0x308db0;
+    void removeSpriteFramesFromDictionary(cocos2d::CCDictionary*) = m1 0x2a05e4, imac 0x309370;
+    void removeSpriteFramesFromFile(char const*) = m1 0x2a030c, imac 0x309190;
+    void removeSpriteFramesFromTexture(cocos2d::CCTexture2D*) = m1 0x2a0830, imac 0x3095d0;
+    void removeUnusedSpriteFrames() = m1 0x29ff90, imac 0x308df0;
     cocos2d::CCSpriteFrame* spriteFrameByName(char const*) = imac 0x3098e0, m1 0x2a0b38;
     //purgeSharedSpriteFrameCache = ios 0x3c4dd4
 }
