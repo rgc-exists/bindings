@@ -1172,7 +1172,7 @@ class cocos2d::CCAction : cocos2d::CCObject {
     void setTarget(cocos2d::CCNode*);
 
     // CCAction(cocos2d::CCAction const&);
-    CCAction() = m1 0x50f94c, imac 0x5dc9c0, ios 0x88938;
+    CCAction() = m1 0x50f94c, imac 0x5dc9c0, ios 0x264808;
     ~CCAction() = m1 0x50f9bc, imac 0x5dca60, ios 0x264848;
     char const* description() = imac 0x5dcb10, m1 0x50fa50;
 
@@ -1385,7 +1385,7 @@ class cocos2d::CCParticleSystem : cocos2d::CCNode, cocos2d::CCTextureProtocol {
     void calculateWorldSpace();
     bool isFull();
     void loadDefaults();
-    void loadScaledDefaults(float) = imac 0x7b60e0;
+    void loadScaledDefaults(float) = m1 0x6c66b4, imac 0x7b60e0, ios 0x199ab8;
     void resetSystem() = imac 0x7b4740, m1 0x6c5358, ios 0x198a38;
     void resumeSystem() = imac 0x7b4730, m1 0x6c534c, ios 0x198a2c;
     void saveDefaults();
@@ -1896,7 +1896,7 @@ class cocos2d::CCFileUtils : cocos2d::TypeInfo {
 
 [[link(win, android)]]
 class cocos2d::CCGLProgram : cocos2d::CCObject {
-    bool initWithVertexShaderByteArray(char const*, char const*) = imac 0x417e60, m1 0x393990, ios 0x1380ac;
+    bool initWithVertexShaderByteArray(char const*, char const*) = imac 0x417e60, m1 0x393990, ios 0x138260;
     bool initWithVertexShaderFilename(char const*, char const*) = m1 0x393a34, imac 0x417f00;
 
     unsigned int const getProgram();
@@ -1969,7 +1969,9 @@ class cocos2d::CCNode : cocos2d::CCObject {
     char const* description() = imac 0x260e70, m1 0x20cc04;
     void detachChild(cocos2d::CCNode*, bool);
     void insertChild(cocos2d::CCNode*, int);
-    unsigned int numberOfRunningActions();
+    unsigned int numberOfRunningActions() = m1 0x20dd8c, imac 0x262010, ios inline {
+        return m_pActionManager->numberOfRunningActionsInTarget(this);
+    }
     void pauseSchedulerAndActions() = m1 0x20dc28, imac 0x261e70, ios 0x23c0c4;
     void qsortAllChildrenWithIndex();
     void resumeSchedulerAndActions() = imac 0x261c50, m1 0x20da08, ios 0x23bed0;
@@ -1977,10 +1979,7 @@ class cocos2d::CCNode : cocos2d::CCObject {
     void schedule(cocos2d::SEL_SCHEDULE) = imac 0x2621b0, m1 0x20dee8, ios 0x23c2fc;
     void schedule(cocos2d::SEL_SCHEDULE, float) = imac 0x262210, m1 0x20df28, ios 0x23c320;
     void schedule(cocos2d::SEL_SCHEDULE selector, float interval, unsigned int repeat, float delay) = imac 0x2621e0, m1 0x20df0c, ios inline {
-        CCAssert( selector, "Argument must be non-nil");
-        CCAssert( interval >=0, "Argument must be positive");
-
-        m_pScheduler->scheduleSelector(selector, this, interval , repeat, delay, !m_bRunning);
+        m_pScheduler->scheduleSelector(selector, this, interval, repeat, delay, !m_bRunning);
     }
     void scheduleOnce(cocos2d::SEL_SCHEDULE selector, float delay) = imac 0x262240, m1 0x20df48, ios inline {
         this->schedule(selector, 0.0f, 0, delay);
@@ -2674,7 +2673,7 @@ class cocos2d::CCKeyboardDispatcher : cocos2d::CCObject {
     void forceAddDelegate(cocos2d::CCKeyboardDelegate*);
     void forceRemoveDelegate(cocos2d::CCKeyboardDelegate*);
     char const* keyToString(cocos2d::enumKeyCodes) = imac 0x1f1aa0, m1 0x1a82e0;
-    void removeDelegate(cocos2d::CCKeyboardDelegate*) = ios 0x239960, imac 0x1f1600, m1 0x1a7e48;
+    void removeDelegate(cocos2d::CCKeyboardDelegate*) = imac 0x1f1600, m1 0x1a7e48; // ios 0x239960
     void updateModifierKeys(bool, bool, bool, bool) = imac 0x1f1a70, m1 0x1a82c8;
 }
 
@@ -3122,6 +3121,21 @@ class cocos2d::CCActionManager : cocos2d::CCObject {
     void removeAction(cocos2d::CCAction*) = ios 0x2f493c;
     void pauseTarget(cocos2d::CCObject*) = imac 0x221b10, m1 0x1d4aec;
     void resumeTarget(cocos2d::CCObject*) = m1 0x1d4be8;
+    unsigned int numberOfRunningActionsInTarget(cocos2d::CCObject* target) = m1 0x1d58cc, imac 0x2227b0, ios inline {
+        struct tHashElement {
+            ccArray* actions;
+            CCObject* target;
+            unsigned int actionIndex;
+            CCAction* currentAction;
+            bool currentActionSalvaged;
+            bool paused;
+            UT_hash_handle hh;
+        };
+
+        tHashElement* element = nullptr;
+        HASH_FIND_INT(reinterpret_cast<tHashElement*>(m_pTargets), &target, element);
+        return element && element->actions ? element->actions->num : 0;
+    }
 }
 
 [[link(win, android)]]
@@ -3201,9 +3215,9 @@ class cocos2d::CCArray : cocos2d::CCObject {
     // static cocos2d::CCArray* createWithCapacity(unsigned int);
     static cocos2d::CCArray* createWithContentsOfFile(char const*);
     static cocos2d::CCArray* createWithContentsOfFileThreadSafe(char const*);
-    static cocos2d::CCArray* createWithObject(cocos2d::CCObject*) = ios 0x249270;
+    // static cocos2d::CCArray* createWithObject(cocos2d::CCObject*) = ios 0x249270;
 
-    bool init() = imac 0x7094e0;
+    // bool init() = imac 0x7094e0;
     bool initWithArray(cocos2d::CCArray*);
     // bool initWithCapacity(unsigned int);
     bool initWithObject(cocos2d::CCObject*);
@@ -3221,11 +3235,11 @@ class cocos2d::CCArray : cocos2d::CCObject {
     void exchangeObject(cocos2d::CCObject*, cocos2d::CCObject*);
     void exchangeObjectAtIndex(unsigned int, unsigned int);
     // void fastRemoveObject(cocos2d::CCObject*);
-    void fastRemoveObjectAtIndex(unsigned int) = imac 0x709f10, m1 0x629530;
+   // void fastRemoveObjectAtIndex(unsigned int) = imac 0x709f10, m1 0x629530;
     void fastRemoveObjectAtIndexChild(unsigned int);
     void fastRemoveObjectAtIndexNew(unsigned int);
     unsigned int indexOfObject(cocos2d::CCObject*) const;
-    void insertObject(cocos2d::CCObject*, unsigned int) = ios 0x2494f4;
+    // void insertObject(cocos2d::CCObject*, unsigned int) = ios 0x2494f4;
     bool isEqualToArray(cocos2d::CCArray*);
     // cocos2d::CCObject* lastObject();
     // cocos2d::CCObject* objectAtIndex(unsigned int) = m1 0x6293a0, imac 0x709d40;
@@ -4375,19 +4389,19 @@ class cocos2d {
     static float ccpDistance(cocos2d::CCPoint const&, cocos2d::CCPoint const&) = m1 0x2d8278, imac 0x342880, ios 0x1b1dec;
     static cocos2d::CCPoint ccpForAngle(float);
     static cocos2d::CCPoint ccpFromSize(cocos2d::CCSize const& size) = ios inline {
-        return ccp(size.width, size.height); // todo: not sure if this is correct (also this is only inline bcs i was lazy)
+        return size;
     }
     static bool ccpFuzzyEqual(cocos2d::CCPoint const&, cocos2d::CCPoint const&, float);
     static cocos2d::CCPoint ccpIntersectPoint(cocos2d::CCPoint const&, cocos2d::CCPoint const&, cocos2d::CCPoint const&, cocos2d::CCPoint const&);
     static float ccpLength(cocos2d::CCPoint const&);
-    static cocos2d::CCPoint ccpLerp(cocos2d::CCPoint const&, cocos2d::CCPoint const&, float) = ios 0x1b1e78;
+    static cocos2d::CCPoint ccpLerp(cocos2d::CCPoint const&, cocos2d::CCPoint const&, float) = m1 0x2d830c, imac 0x342960, ios 0x1b1e78;
     static bool ccpLineIntersect(cocos2d::CCPoint const&, cocos2d::CCPoint const&, cocos2d::CCPoint const&, cocos2d::CCPoint const&, float*, float*) = ios 0x1b1f4c;
     static cocos2d::CCPoint ccpNormalize(cocos2d::CCPoint const&) = imac 0x3428c0, m1 0x2d82a8, ios 0x1b1e1c;
     static cocos2d::CCPoint ccpRotateByAngle(cocos2d::CCPoint const&, cocos2d::CCPoint const&, float);
     static bool ccpSegmentIntersect(cocos2d::CCPoint const&, cocos2d::CCPoint const&, cocos2d::CCPoint const&, cocos2d::CCPoint const&);
     static float ccpToAngle(cocos2d::CCPoint const&);
     static char const* cocos2dVersion();
-    static float clampf(float, float, float) = ios 0x1b1edc;
+    static float clampf(float, float, float) = m1 0x2d8370, imac 0x3429d0, ios 0x1b1edc;
 }
 
 [[link(win, android)]]
@@ -4559,6 +4573,24 @@ class cocos2d::extension::CCScale9Sprite : cocos2d::CCNodeRGBA {
     	return nullptr;
     }
     static cocos2d::extension::CCScale9Sprite* create(char const*, cocos2d::CCRect) = imac 0x3e3810, m1 0x365afc, ios 0x216814;
+    static cocos2d::extension::CCScale9Sprite* create(char const* filename, cocos2d::CCRect rect, cocos2d::CCRect capInsets) = m1 0x3659d4, imac 0x3e3710, ios inline {
+        CCScale9Sprite* ret = new CCScale9Sprite;
+        if (ret->initWithFile(filename, rect, capInsets)) {
+            ret->autorelease();
+            return ret;
+        }
+        delete ret;
+        return nullptr;
+    }
+    static cocos2d::extension::CCScale9Sprite* create(cocos2d::CCRect capInsets, char const* filename) = m1 0x365c1c, imac 0x3e3900, ios inline {
+        CCScale9Sprite* ret = new CCScale9Sprite;
+        if (ret->initWithFile(capInsets, filename)) {
+            ret->autorelease();
+            return ret;
+        }
+        delete ret;
+        return nullptr;
+    }
 
     CCScale9Sprite() = m1 0x3642fc, imac 0x3e1e50, ios 0x2151f4;
     ~CCScale9Sprite() = m1 0x3643b0, imac 0x3e1f40, ios 0x215354;
@@ -4620,9 +4652,9 @@ class cocos2d::ZipUtils {
     static int ccDeflateMemory(unsigned char* data, unsigned int size, unsigned char** out) = imac 0x1f3290, m1 0x1a8dd8, ios 0x23d50c;
     static int ccInflateCCZFile(char const*, unsigned char**);
     static int ccInflateGZipFile(char const*, unsigned char**);
-    static int ccInflateMemory(unsigned char* data, unsigned int size, unsigned char** out) = imac 0x1f3660, m1 0x1a91b0;
-    static int ccInflateMemoryWithHint(unsigned char*, unsigned int, unsigned char**, unsigned int*, unsigned int) = imac 0x1f45f0, m1 0x1aa1b8;
-    static int ccInflateMemoryWithHint(unsigned char*, unsigned int, unsigned char**, unsigned int) = imac 0x1f4720, m1 0x1aa2e0;
+    // static int ccInflateMemory(unsigned char* data, unsigned int size, unsigned char** out) = imac 0x1f3660, m1 0x1a91b0;
+    // static int ccInflateMemoryWithHint(unsigned char*, unsigned int, unsigned char**, unsigned int*, unsigned int) = imac 0x1f45f0, m1 0x1aa1b8;
+    // static int ccInflateMemoryWithHint(unsigned char*, unsigned int, unsigned char**, unsigned int) = imac 0x1f4720, m1 0x1aa2e0;
     static void ccSetPvrEncryptionKey(unsigned int, unsigned int, unsigned int, unsigned int);
     static void ccSetPvrEncryptionKeyPart(int, unsigned int);
     static gd::string compressString(gd::string const& data, bool encrypt, int encryptionKey) = imac 0x1f3020, m1 0x1a8b18, ios 0x23d2b8;
