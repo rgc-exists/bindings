@@ -1948,6 +1948,7 @@ class cocos2d::CCFadeTo : cocos2d::CCActionInterval {
 class cocos2d::CCFileUtils : cocos2d::TypeInfo {
     // CCFileUtils(); // one of these two is 0x15bfa8
     // CCFileUtils(cocos2d::CCFileUtils const&);
+    ~CCFileUtils();
     virtual void addSearchPath(char const*) = m1 0x3a42d4, imac 0x4294e0, ios 0x155a30;
     virtual void addSearchResolutionsOrder(char const*) = imac 0x428f30, m1 0x3a3d24, ios 0x155538;
     virtual gd::string addSuffix(gd::string, gd::string) = imac 0x4273f0, m1 0x3a21f4, ios 0x15459c;
@@ -2269,6 +2270,7 @@ class cocos2d::CCScheduler : cocos2d::CCObject {
 
     // CCScheduler(cocos2d::CCScheduler const&);
     // CCScheduler();
+    ~CCScheduler();
 
     void appendIn(cocos2d::_listEntry**, cocos2d::CCObject*, bool);
     bool isTargetPaused(cocos2d::CCObject*);
@@ -2829,7 +2831,7 @@ class cocos2d::CCIMEDispatcher {
     void removeDelegate(cocos2d::CCIMEDelegate*);
 }
 
-[[link(win, android)]]
+[[link(win, android, ios)]]
 class cocos2d::CCKeyboardDispatcher : cocos2d::CCObject {
     static cocos2d::enumKeyCodes convertKeyCode(cocos2d::enumKeyCodes);
 
@@ -3374,6 +3376,40 @@ class cocos2d::CCApplication : cocos2d::CCApplicationProtocol {
     static cocos2d::CCApplication* sharedApplication() = imac 0x314fe0, m1 0x2ab200, ios 0x1af428;
 
     ~CCApplication() = m1 0x2ab124, imac 0x314ee0, ios 0x1af2ec;
+
+    [[missing(android, mac, ios)]]
+    void toggleVerticalSync(bool);
+    [[missing(android, mac, ios)]]
+    void setupVerticalSync();
+    [[missing(android, mac, ios)]]
+    void updateVerticalSync();
+    [[missing(android, mac, ios)]]
+    void updateControllerKeys(CXBOXController* controller, int userIndex);
+
+    [[missing(android, mac, ios)]]
+    int getTimeElapsed();
+    [[missing(android, mac, ios)]]
+    void resetForceTimer();
+
+    [[missing(android, mac, ios)]]
+    void leftMouseDown();
+    [[missing(android, mac, ios)]]
+    void leftMouseUp();
+
+    [[missing(android, mac, ios)]]
+    void logTimeElapsed(gd::string);
+
+    [[missing(android, mac, ios)]]
+    void moveMouse(int relX, int relY);
+
+    [[missing(android, mac, ios)]]
+    void shutdownApplication();
+    [[missing(android, mac, ios)]]
+    void toggleMouseControl(bool);
+    [[missing(android, mac, ios)]]
+    void updateController();
+    [[missing(android, mac, ios)]]
+    void updateMouseControl();
 
     virtual int run();
     virtual void setAnimationInterval(double) = m1 0x2ab1cc, imac 0x314f90, ios 0x1af3fc;
@@ -4994,7 +5030,12 @@ class cocos2d::CCLightning : cocos2d::CCNode, cocos2d::CCRGBAProtocol {
     }
 
     CCLightning() = win 0x44400, ios 0x347014;
-    ~CCLightning() = win 0x444d0, ios 0x3470bc;
+    ~CCLightning() = win inline, ios 0x3470bc {
+        if (m_lightningPoints) {
+            free(m_lightningPoints);
+            m_lightningPoints = nullptr;
+        }
+    }
 
     void strike() = win 0x44880, m1 0x4faa74, ios 0x347290;
     void strikeFinished() = win 0x448f0, imac 0x5c5e60;
