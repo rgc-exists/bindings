@@ -2120,7 +2120,7 @@ class cocos2d::CCNode : cocos2d::CCObject {
     bool getUseChildIndex();
 
     void setAdditionalTransform(cocos2d::CCAffineTransform const&);
-    void setUseChildIndex(bool);
+    void setUseChildIndex(bool) = m1 0x20d228, imac 0x261460, ios 0x23b978;
 
     cocos2d::CCRect boundingBox() = imac 0x260cd0, m1 0x20ca74, ios 0x23b390;
     void childrenAlloc();
@@ -5439,4 +5439,105 @@ class cocos2d::CCScriptEngineManager {
     
     static cocos2d::CCScriptEngineManager* sharedManager() = m1 0x29e3d8, imac 0x3072f0, ios 0x2726e0;
     static void purgeSharedManager();
+}
+
+[[link(win, android)]]
+class cocos2d::CCJumpBy : cocos2d::CCActionInterval {
+    static cocos2d::CCJumpBy* create(float, cocos2d::CCPoint const&, float, unsigned int) = m1 0x332700, imac 0x3a5ef0, ios inline {
+        auto ret = new CCJumpBy();
+        ret->initWithDuration(p0, p1, p2, p3);
+        ret->autorelease();
+        return ret;
+    }
+
+    bool initWithDuration(float, cocos2d::CCPoint const&, float, unsigned int) = m1 0x3327f0, imac 0x3a6010, ios inline {
+        if (!CCActionInterval::initWithDuration(p0)) return false;
+        m_delta = p1;
+        m_height = p2;
+        m_nJumps = p3;
+        return true;
+    }
+
+    // CCJumpBy(cocos2d::CCJumpBy const&);
+    // CCJumpBy();
+
+    virtual cocos2d::CCObject* copyWithZone(cocos2d::CCZone* pZone) = m1 0x33284c, imac 0x3a6080, ios inline {
+        CCZone* pNewZone = nullptr;
+        CCJumpBy* pCopy = nullptr;
+        if (pZone && pZone->m_pCopyObject) {
+            pCopy = (CCJumpBy*)(pZone->m_pCopyObject);
+        }
+        else {
+            pCopy = new CCJumpBy();
+            pZone = pNewZone = new CCZone(pCopy);
+        }
+
+        CCActionInterval::copyWithZone(pZone);
+
+        pCopy->initWithDuration(m_fDuration, m_delta, m_height, m_nJumps);
+
+        CC_SAFE_DELETE(pNewZone);
+        return pCopy;
+    }
+    virtual void update(float t) = m1 0x3329e4, imac 0x3a6240, ios inline {
+        if (m_pTarget) {
+            float frac = fmodf(t * m_nJumps, 1.f);
+            float y = m_height * 4.f * frac * (1.f - frac);
+            y += m_delta.y * t;
+
+            float x = m_delta.x * t;
+            CCPoint currentPos = m_pTarget->getPosition();
+
+            CCPoint diff = currentPos - m_previousPos;
+            m_startPosition = diff + m_startPosition;
+
+            CCPoint newPos = m_startPosition + CCPoint { x, y };
+            m_pTarget->setPosition(newPos);
+
+            m_previousPos = newPos;
+        }
+    }
+    virtual void startWithTarget(cocos2d::CCNode* pTarget) = m1 0x332990, imac 0x3a61f0, ios inline {
+        CCActionInterval::startWithTarget(pTarget);
+        m_previousPos = m_startPosition = pTarget->getPosition();
+    }
+    virtual cocos2d::CCActionInterval* reverse() = m1 0x332af0, imac 0x3a6370, ios inline {
+        return CCJumpBy::create(m_fDuration, -m_delta, m_height, m_nJumps);
+    }
+}
+
+[[link(win, android)]]
+class cocos2d::CCJumpTo : cocos2d::CCActionInterval {
+    static cocos2d::CCJumpTo* create(float, cocos2d::CCPoint const&, float, int) = m1 0x332b48, imac 0x3a63d0, ios inline {
+        auto ret = new CCJumpTo();
+        ret->initWithDuration(p0, p1, p2, p3);
+        ret->autorelease();
+        return ret;
+    }
+
+    // CCJumpTo(cocos2d::CCJumpTo const&);
+    // CCJumpTo();
+
+    virtual cocos2d::CCObject* copyWithZone(cocos2d::CCZone* pZone) = m1 0x332c44, imac 0x3a64f0, ios inline {
+        CCZone* pNewZone = nullptr;
+        CCJumpTo* pCopy = nullptr;
+        if (pZone && pZone->m_pCopyObject) {
+            pCopy = (CCJumpTo*)(pZone->m_pCopyObject);
+        }
+        else {
+            pCopy = new CCJumpTo();
+            pZone = pNewZone = new CCZone(pCopy);
+        }
+
+        CCJumpBy::copyWithZone(pZone);
+
+        pCopy->initWithDuration(m_fDuration, m_delta, m_height, m_nJumps);
+
+        CC_SAFE_DELETE(pNewZone);
+        return pCopy;
+    }
+    virtual void startWithTarget(cocos2d::CCNode* pTarget) = m1 0x332d94, imac 0x3a6670, ios inline {
+        CCJumpBy::startWithTarget(pTarget);
+        m_delta = m_delta - m_startPosition;
+    }
 }
