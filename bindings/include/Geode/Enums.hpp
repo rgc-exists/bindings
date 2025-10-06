@@ -204,7 +204,8 @@ enum class UserListType {
     Blocked = 1,
 };
 enum class GJErrorCode {
-    NotFound = -1,
+    NotFound = -2,
+    GenericError = -1,
     UpdateApp = 3
 };
 enum class AccountError {
@@ -615,6 +616,8 @@ enum class BoomListType {
     Comment = 0x7,
     Comment2 = 0x8,
     Comment3 = 0x9,
+    List = 0xa,
+    Game = 0xb,
     Song = 0xc,
     Score = 0xd,
     MapPack = 0xe,
@@ -834,9 +837,12 @@ enum class GJDifficulty {
 
 enum class GJLevelType {
     Default = 0,
-    Local = 1,
+    Main = 1,
+    //TODO: remove for Geode 5.0.0, this is confusing because Local usually means Editor in RobTop terms
+    Local [[deprecated("Use Main instead")]] = 1,
     Editor = 2,
-    Saved = 3
+    Saved = 3,
+    SearchResult = 4
 };
 
 enum class GJRewardType
@@ -878,14 +884,17 @@ enum class GJChallengeType {
 };
 
 enum class GJScoreType {
-    Unknown = 0,
-    Creator = 1
+    Top = 0,
+    Creator = 1,
+    Search = 2,
+    LevelScore = 3
 };
 
 enum class LevelLeaderboardType {
     Friends = 0,
     Global = 1,
-    Weekly = 2
+    Weekly = 2,
+    Local = 3
 };
 
 enum class GJHttpType {
