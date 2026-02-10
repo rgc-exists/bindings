@@ -38,6 +38,7 @@ enum class SearchType {
     Sent = 27,
     FeaturedLite = 28,
     Bonus = 29,
+    StarAward = 30,
     MyLevels = 98,
     SavedLevels = 99,
     FavouriteLevels = 100,
@@ -223,8 +224,8 @@ enum class AccountError {
     AlreadyUsedUsername = -2
 };
 enum class GJSongError {
-    DownloadSongFailed = 1,
-    DownloadSFXFailed = 2,
+    FailedToFetch = 1,
+    NotAllowed = 2,
     DownloadCancelled = 3
 };
 enum class GJSongType {
@@ -245,7 +246,8 @@ enum class CommentError {
 };
 enum class BackupAccountError {
     BackupOrSyncFailed = -3,
-    LoginFailed = -2
+    LoginFailed = -2,
+    GenericError = -1
 };
 enum class GJMusicAction {
     DownloadOrUpdate = 2,
@@ -324,7 +326,13 @@ enum class GauntletType {
     NCS = 0x33,
     NCS2 = 0x34,
     Space = 0x35,
-    Cosmos = 0x36
+    Cosmos = 0x36,
+    Random = 0x37,
+    Chance = 0x38,
+    Future = 0x39,
+    Utopia = 0x3A,
+    Cinema = 0x3B,
+    Love = 0x3C
 };
 enum class GJMPErrorCode {
     Failed = 0
@@ -336,7 +344,8 @@ enum class GJTimedLevelType {
 };
 enum class SongSelectType {
     Default = 0,
-    Custom = 1
+    Custom = 1,
+    Default2 = 2
 };
 enum class AudioTargetType {
     SFXChannel = 0,
@@ -469,6 +478,7 @@ enum class LevelLeaderboardMode {
 enum class StatKey {
     Jumps = 1,
     Attempts = 2,
+    CompletedOfficialLevels = 3,
     CustomLevels = 4,
     Demons = 5,
     Stars = 6,
@@ -487,12 +497,14 @@ enum class StatKey {
     IceShards = 19,
     LavaShards = 20,
     Keys = 21,
+    OrbsCollected = 22,
     EarthShards = 23,
     BloodShards = 24,
     MetalShards = 25,
     LightShards = 26,
     SoulShards = 27,
     Moons = 28,
+    DiamondShards = 29,
     FirePath = 30,
     IcePath = 31,
     PoisonPath = 32,
@@ -506,6 +518,7 @@ enum class StatKey {
     Gauntlets = 40,
     ListsRewards = 41,
     Insanes = 42,
+    WraithKeys = 43,
 };
 enum class TextStyleType {
     Colored = 1,
@@ -546,62 +559,75 @@ enum class gjParticleValue {
     MaxParticles = 1,
     Duration = 2,
     Lifetime = 3,
-    PlusMinus1 = 4,
+    LifetimeVar = 4,
     Emission = 5,
     Angle = 6,
-    PlusMinus2 = 7,
+    AngleVar = 7,
     Speed = 8,
-    PlusMinus3 = 9,
+    SpeedVar = 9,
     PosVarX = 0xA,
     PosVarY = 0xB,
     GravityX = 0xC,
     GravityY = 0xD,
     AccelRad = 0xE,
-    PlusMinus4 = 0xF,
+    AccelRadVar = 0xF,
     AccelTan = 0x10,
-    PlusMinus5 = 0x11,
+    AccelTanVar = 0x11,
     StartSize = 0x12,
-    PlusMinus6 = 0x13,
+    StartSizeVar = 0x13,
     EndSize = 0x14,
-    PlusMinus7 = 0x15,
+    EndSizeVar = 0x15,
     StartSpin = 0x16,
-    PlusMinus8 = 0x17,
+    StartSpinVar = 0x17,
     EndSpin = 0x18,
-    PlusMinus9 = 0x19,
+    EndSpinVar = 0x19,
     StartR = 0x1A,
-    PlusMinus10 = 0x1B,
+    StartRVar = 0x1B,
     StartG = 0x1C,
-    PlusMinus11 = 0x1D,
+    StartGVar = 0x1D,
     StartB = 0x1E,
-    PlusMinus12 = 0x1F,
+    StartBVar = 0x1F,
     StartA = 0x20,
-    PlusMinus13 = 0x21,
+    StartAVar = 0x21,
     EndR = 0x22,
-    PlusMinus14 = 0x23,
+    EndRVar = 0x23,
     EndG = 0x24,
-    PlusMinus15 = 0x25,
+    EndGVar = 0x25,
     EndB = 0x26,
-    PlusMinus16 = 0x27,
+    EndBVar = 0x27,
     EndA = 0x28,
-    PlusMinus17 = 0x29,
+    EndAVar = 0x29,
     FadeIn = 0x2A,
-    PlusMinus18 = 0x2B,
+    FadeInVar = 0x2B,
     FadeOut = 0x2C,
-    PlusMinus19 = 0x2D,
+    FadeOutVar = 0x2D,
     FrictionP = 0x2E,
-    PlusMinus20 = 0x2F,
+    FrictionPVar = 0x2F,
     Respawn = 0x30,
-    PlusMinus21 = 0x31,
+    RespawnVar = 0x31,
     StartRad = 0x32,
-    PlusMinus22 = 0x33,
+    StartRadVar = 0x33,
     EndRad = 0x34,
-    PlusMinus23 = 0x35,
+    EndRadVar = 0x35,
     RotSec = 0x36,
-    PlusMinus24 = 0x37,
+    RotSecVar = 0x37,
+    UniformColor = 0x38,
+    PositionType = 0x39,
+    Blending = 0x3A,
+    StartSpinEqualToEnd = 0x3B,
+    StartRotationIsDir = 0x3C,
+    DynamicRotation = 0x3D,
+    EmitterMode = 0x3E,
+    ParticleIdx = 0x3F,
+    OrderSensitive = 0x40,
+    StartSizeEqualToEnd = 0x41,
+    StartRadiusEqualToEnd = 0x42,
+    StartRGBVarSync = 0x43,
+    EndRGBVarSync = 0x44,
     FrictionS = 0x45,
-    PlusMinus25 = 0x46,
+    FrictionSVar = 0x46,
     FrictionR = 0x47,
-    PlusMinus26 = 0x48
+    FrictionRVar = 0x48
 };
 enum class ColorSelectType {
     Pulse = 0,
@@ -821,6 +847,7 @@ enum class SelectArtType {
     Background = 0,
     Ground = 1,
     Middleground = 2,
+    Premade = 3
 };
 
 enum class UndoCommand {
@@ -872,8 +899,6 @@ enum class GJDifficulty {
 enum class GJLevelType {
     Default = 0,
     Main = 1,
-    //TODO: remove for Geode 5.0.0, this is confusing because Local usually means Editor in RobTop terms
-    Local [[deprecated("Use Main instead")]] = 1,
     Editor = 2,
     Saved = 3,
     SearchResult = 4
@@ -994,7 +1019,9 @@ enum class GJHttpType {
     UploadLevelList = 0x3D,
     DeleteServerLevelList = 0x3E,
     GetNews = 0x3F,
-    GetGJSecretReward = 0x40
+    GetGJSecretReward = 0x40,
+    GetLevelRateInfo = 0x41,
+    RateLevelAdmin = 0x42
 };
 
 enum class DialogChatPlacement {
@@ -1043,13 +1070,19 @@ enum class MoveTargetType {
     YOnly = 2,
 };
 
-// Geode Addition
-enum class LeaderboardState {
+enum class LeaderboardType {
     Default = 0,
     Top100 = 1,
     Global = 2,
     Creator = 3,
     Friends = 4,
+};
+
+enum class LeaderboardStat {
+    Stars = 0,
+    Moons = 1,
+    Demons = 2,
+    UserCoins = 3
 };
 
 // Wylie Addition (https://github.com/Wyliemaster/GD-Decompiled/blob/main/GD/code/headers/Layers/LevelSettingsLayer.h)
@@ -1220,7 +1253,7 @@ namespace GameVar {
     constexpr auto HideAttemptsNormal = "0135";
     constexpr auto ExtraLDM = "0136";
     constexpr auto HideParticleIcons = "0137";
-    constexpr auto DisableParticleEffects = "0139";
+    constexpr auto ColorIDFilter = "0139";
     constexpr auto DisableOrbScale = "0140";
     constexpr auto DisableTriggerOrbScale = "0141";
     constexpr auto ReduceAudioQuality = "0142";
@@ -1252,4 +1285,22 @@ namespace GameVar {
     constexpr auto IgnoreDamageLevel = "0173";
     constexpr auto HidePlaytestText = "0174";
     constexpr auto BorderlessFix = "0175";
+    constexpr auto ClickOnSteps = "0176";
+    constexpr auto ClickBetweenSteps = "0177";
+    constexpr auto ParticlesPerfLog = "0178";
+    constexpr auto HitboxOnDeath = "0179";
+    constexpr auto LinkControlsQuickToggle = "0180";
+    constexpr auto StaticTraceArrows = "0181";
 }
+
+// frozen archaic versions of enums
+
+#if GEODE_COMP_GD_VERSION < 22080
+enum class LeaderboardState {
+    Default = 0,
+    Top100 = 1,
+    Global = 2,
+    Creator = 3,
+    Friends = 4,
+};
+#endif

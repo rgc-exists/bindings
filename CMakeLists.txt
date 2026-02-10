@@ -174,6 +174,7 @@ add_custom_command(
 
 if (GEODE_IS_MEMBER_TEST)
 	set(GEODE_MEMBER_TEST_CODEGEN_PATH ${GEODE_CODEGEN_PATH} PARENT_SCOPE)
+	set(GEODE_MEMBER_TEST_BINDINGS_PATH ${GEODE_BINDINGS_PATH} PARENT_SCOPE)
 	return()
 endif()
 
@@ -183,10 +184,18 @@ else()
 	set(GEODE_INCLUDE_SYSTEM_SPECIFIER SYSTEM)
 endif()
 
+file(GLOB GEODE_INLINE_SOURCES ${GEODE_BINDINGS_PATH}/inline/*.cpp)
+file(GLOB GEODE_GENERATED_SOURCES ${GEODE_CODEGEN_PATH}/Geode/source/*.cpp)
 
-add_library(${PROJECT_NAME} ${GEODE_CODEGEN_PATH}/Geode/GeneratedSource.cpp)
+
+add_library(${PROJECT_NAME} ${GEODE_CODEGEN_PATH}/Geode/GeneratedSource.cpp ${GEODE_INLINE_SOURCES} ${GEODE_GENERATED_SOURCES})
 target_include_directories(${PROJECT_NAME} ${GEODE_INCLUDE_SYSTEM_SPECIFIER} PUBLIC
 	${GEODE_CODEGEN_PATH}
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    UNITY_BUILD ON
+    UNITY_BUILD_BATCH_SIZE 128
 )
 
 if (NOT BINDINGS_VERSIONED_ONLY)
@@ -196,9 +205,12 @@ if (NOT BINDINGS_VERSIONED_ONLY)
 endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_VISIBILITY_PRESET hidden)
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
+
+target_compile_definitions(${PROJECT_NAME} PUBLIC GEODE_COMP_GD_VERSION=${GEODE_COMP_GD_VERSION})
 
 if (WIN32)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC -DNOMINMAX)
 	if (MSVC)
 		target_compile_options(${PROJECT_NAME} PUBLIC /bigobj)
 	endif()

@@ -516,14 +516,14 @@ public class ScriptWrapper {
         if (!(type instanceof Composite)) {
             return false;
         }
-        if (platform == Platform.WINDOWS32 || platform == Platform.WINDOWS64) {
+        if (type.getName().startsWith("CCPoint") || type.getName().startsWith("CCSize") || type.getName().startsWith("CCRect")) {
             return true;
+        }
+        if (platform == Platform.WINDOWS32 || platform == Platform.WINDOWS64) {
+            return type.getLength() != 4 && type.getLength() != 8;
         }
         if (type.getName().startsWith("RGBA") || type.getName().startsWith("HSV")) {
             return platform == Platform.MAC_INTEL;
-        }
-        if (type.getName().startsWith("CCPoint") || type.getName().startsWith("CCSize") || type.getName().startsWith("CCRect")) {
-            return true;
         }
         if (type.getLength() > 16) {
             return true;
@@ -661,6 +661,7 @@ public class ScriptWrapper {
             var stringDataUnion = new UnionDataType(cat, cat.getName());
             stringDataUnion.add(new PointerDataType(CharDataType.dataType), pointerSize, "ptr", "");
             stringDataUnion.add(new ArrayDataType(CharDataType.dataType, 0x10, 0x1), 0x10, "data", "SSO");
+            stringDataUnion.setPackingEnabled(true);
 
             cat = this.createCategoryAll(category.extend("gd", "string"));
             var string = new StructureDataType(cat, cat.getName(), 0x0);
@@ -696,11 +697,13 @@ public class ScriptWrapper {
             if (platform != Platform.MAC_INTEL) {
                 stringShort.add(ByteDataType.dataType, 0x1, "size", "The size of the string data");
             }
+            stringShort.setPackingEnabled(true);
 
             cat = this.createCategoryAll(category.extend("gd", "string_data_union"));
             var stringDataUnion = new UnionDataType(cat, cat.getName());
             stringDataUnion.add(stringLong, pointerSize * 3, "long", "Long string data");
             stringDataUnion.add(stringShort, pointerSize * 3, "short", "Short string data");
+            stringDataUnion.setPackingEnabled(true);
 
             cat = this.createCategoryAll(category.extend("gd", "string"));
             var string = new StructureDataType(cat, cat.getName(), 0x0);
@@ -721,6 +724,7 @@ public class ScriptWrapper {
             var stringDataUnion = new UnionDataType(cat, cat.getName());
             stringDataUnion.add(new PointerDataType(stringData), pointerSize, "data", "Pointer to the string information");
             stringDataUnion.add(new PointerDataType(CharDataType.dataType), pointerSize, "ptr", "Pointer to the string data");
+            stringDataUnion.setPackingEnabled(true);
 
             cat = this.createCategoryAll(category.extend("gd", "string"));
             var string = new StructureDataType(cat, cat.getName(), 0x0);
@@ -940,6 +944,26 @@ public class ScriptWrapper {
         callFuncSelector.setCallingConvention("__thiscall");
         manager.addDataType(callFuncSelector, DataTypeConflictHandler.REPLACE_HANDLER);
 
+        // cocos2d::SEL_CallFuncO
+
+        cat = this.createCategoryAll(category.extend("cocos2d", "SEL_CallFuncO"));
+        var callFuncOSelector = new FunctionDefinitionDataType(cat, cat.getName());
+        callFuncOSelector.setArguments(new ParameterDefinition[] {
+            new ParameterDefinitionImpl(
+                "this",
+                this.addOrGetType(Broma.Type.ptr(Broma.fake(), "cocos2d::CCObject"), platform),
+                "The target object for this callback"
+            ),
+            new ParameterDefinitionImpl(
+                "data",
+                this.addOrGetType(Broma.Type.ptr(Broma.fake(), "cocos2d::CCObject"), platform),
+                "The data object for this callback"
+            ),
+        });
+        callFuncOSelector.setReturnType(VoidDataType.dataType);
+        callFuncOSelector.setCallingConvention("__thiscall");
+        manager.addDataType(callFuncOSelector, DataTypeConflictHandler.REPLACE_HANDLER);
+
         // cocos2d::SEL_CallFuncN
 
         cat = this.createCategoryAll(category.extend("cocos2d", "SEL_CallFuncN"));
@@ -1069,6 +1093,14 @@ public class ScriptWrapper {
         ccDictElement.add(utHashHandle, utHashHandle.getLength(), "hh", "Hash handle for the element");
         ccDictElement.setPackingEnabled(true);
         manager.addDataType(ccDictElement, DataTypeConflictHandler.REPLACE_HANDLER);
+
+        // cocos2d::cc_timeval
+        cat = this.createCategoryAll(category.extend("cocos2d", "cc_timeval"));
+        var ccTimeval = new StructureDataType(cat, cat.getName(), 0x0);
+        ccTimeval.add(LongDataType.dataType, LongDataType.dataType.getLength(), "tv_sec", "Seconds");
+        ccTimeval.add(IntegerDataType.dataType, 4, "tv_usec", "Microseconds");
+        ccTimeval.setPackingEnabled(true);
+        manager.addDataType(ccTimeval, DataTypeConflictHandler.REPLACE_HANDLER);
 
         // geode::SeedValueSRV etc.
 
