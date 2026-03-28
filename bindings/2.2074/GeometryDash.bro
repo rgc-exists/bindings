@@ -1385,6 +1385,7 @@ class BoomScrollLayer : cocos2d::CCLayer {
         CC_SAFE_RELEASE(m_dots);
     }
 
+    // note that if looped is set to false, culling with also be disabled
     static BoomScrollLayer* create(cocos2d::CCArray* pages, int offset, bool looped, cocos2d::CCArray* dynamicObjects, DynamicScrollDelegate* delegate) = win 0x3d060, imac 0x391a10, m1 0x3204b4, ios 0x12e27c;
     static BoomScrollLayer* create(cocos2d::CCArray* pages, int offset, bool looped) = win inline, imac 0x391e00, m1 0x320880, ios 0x12e5b4 {
         return BoomScrollLayer::create(pages, offset, looped, nullptr, nullptr);
@@ -12079,7 +12080,7 @@ class GameObject : CCSpritePlus {
     bool m_blackChildOpacityLocked;
     bool m_editorEnabled;
     bool m_isGroupDisabled;
-    bool m_unk28B;
+    bool m_isGroupDisabledTemp;
     bool m_unk28c;
 
     // somehow related to property 155 and 156 if anyone wants to reverse engineer
@@ -22825,11 +22826,11 @@ class LevelEditorLayer : GJBaseGameLayer, LevelSettingsDelegate {
         CCARRAY_FOREACH(objects, obj) {
             auto object = static_cast<GameObject*>(obj);
             if (show) {
-                object->m_unk28B = object->m_isGroupDisabled;
+                object->m_isGroupDisabledTemp = object->m_isGroupDisabled;
                 object->m_isGroupDisabled = false;
             }
             else {
-                object->m_isGroupDisabled = object->m_unk28B;
+                object->m_isGroupDisabled = object->m_isGroupDisabledTemp;
             }
         }
     }
@@ -27849,6 +27850,27 @@ class PlayerObject : GameObject, AnimatedSpriteDelegate {
         this->logValues();
     }
 
+    /// @note geode addition
+    /// @note this will return false for PlayerObjects in MenuGameLayer
+    /// @note this might break if you call from PlayerObject::init
+    bool isVanillaPlayer() {
+        return m_gameLayer && (this == m_gameLayer->m_player1 || this == m_gameLayer->m_player2);
+    }
+
+    /// @note geode addition
+    /// @note this will return false for PlayerObjects in MenuGameLayer
+    /// @note this might break if you call from PlayerObject::init
+    bool isPlayer1() {
+        return m_gameLayer && this == m_gameLayer->m_player1;
+    }
+
+    /// @note geode addition
+    /// @note this will return false for PlayerObjects in MenuGameLayer
+    /// @note this might break if you call from PlayerObject::init
+    bool isPlayer2() {
+        return m_gameLayer && this == m_gameLayer->m_player2;
+    }
+
     cocos2d::CCNode* m_mainLayer;
     bool m_wasTeleported;
     bool m_fixGravityBug;
@@ -30426,7 +30448,7 @@ class SequenceTriggerGameObject : ChanceTriggerGameObject {
             m_sequenceTotalCount = total;
         }
     }
-    
+
     SequenceTriggerState m_sequenceState;
     // property 437
     float m_minInt;
