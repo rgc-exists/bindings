@@ -570,7 +570,7 @@ class AppDelegate : cocos2d::CCApplication, cocos2d::CCSceneDelegate {
     bool m_ios;
     bool m_unk0eb;
     bool m_unk0ec;
-    bool m_unk0ed;
+    bool m_needsSafeArea;
     float m_saveTime;
 }
 
@@ -6665,9 +6665,9 @@ class GameOptionsLayer : GJOptionsLayer {
     virtual void didToggle(int tag) = win 0x2a0560, imac 0x2b1ea0, m1 0x24ffa8, ios 0x2e2190;
 
     bool init(GJBaseGameLayer* baseGameLayer) = win inline, imac 0x2b10b0, m1 0x24f210, ios 0x2e15ec;
-    void onPracticeMusicSync(cocos2d::CCObject* sender) = win 0x2a0270, imac 0x2b18a0, m1 0x24f9c0, ios 0x2e1d48;
-    void onUIOptions(cocos2d::CCObject* sender) = win 0x2a03f0, imac 0x2b1800, m1 0x24f92c, ios 0x2e1cb4;
-    void onUIPOptions(cocos2d::CCObject* sender) = win 0x2a0410, imac 0x2b1880, m1 0x24f9a0, ios 0x2e1d28;
+    void onPracticeMusicSync(cocos2d::CCObject* sender) = win 0x2a0270, imac 0x2b1800, m1 0x24f92c, ios 0x2e1cb4;
+    void onUIOptions(cocos2d::CCObject* sender) = win 0x2a03f0, imac 0x2b1880, m1 0x24f9a0, ios 0x2e1d28;
+    void onUIPOptions(cocos2d::CCObject* sender) = win 0x2a0410, imac 0x2b18a0, m1 0x24f9c0, ios 0x2e1d48;
     void showPracticeMusicSyncUnlockInfo() = win 0x29fa10, imac 0x2b1900, m1 0x24fa2c, ios 0x2e1d64;
 
     GJBaseGameLayer* m_baseGameLayer;
@@ -14812,7 +14812,7 @@ class PlayerObject : GameObject, AnimatedSpriteDelegate {
     double m_maybeReverseAcceleration;
     float m_xVelocityRelated2;
     bool m_isDashing;
-    int m_unk9e8;
+    int m_dashFireFrame;
     int m_groundObjectMaterial;
     float m_vehicleSize;
     float m_playerSpeed;
