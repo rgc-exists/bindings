@@ -3292,16 +3292,16 @@ class DialogObject : cocos2d::CCObject {
     // virtual ~DialogObject();
     DialogObject() = inline;
 
-    static DialogObject* create(gd::string character, gd::string text, int characterFrame, float textScale, bool skippable, cocos2d::ccColor3B color) = win 0xd32d0, imac 0x3c6c40, m1 0x3482a0, ios 0x865b4;
+    static DialogObject* create(gd::string character, gd::string text, int characterFrame, float textScale, bool unskippable, cocos2d::ccColor3B nameColor) = win 0xd32d0, imac 0x3c6c40, m1 0x3482a0, ios 0x865b4;
 
-    bool init(gd::string character, gd::string text, int characterFrame, float textScale, bool skippable, cocos2d::ccColor3B color) = win inline, imac 0x3c6dd0, m1 0x348458, ios inline;
+    bool init(gd::string character, gd::string text, int characterFrame, float textScale, bool unskippable, cocos2d::ccColor3B nameColor) = win inline, imac 0x3c6dd0, m1 0x348458, ios inline;
 
     gd::string m_text;
     gd::string m_character;
     int m_characterFrame;
-    cocos2d::ccColor3B m_color;
+    cocos2d::ccColor3B m_nameColor;
     float m_textScale;
-    bool m_skippable;
+    bool m_unskippable;
 }
 
 [[link(android)]]
@@ -12724,6 +12724,8 @@ class LevelSettingsObject : cocos2d::CCNode {
     bool m_reverseSync;
     // property kA45
     bool m_decreaseBoostSlide;
+    // property kA48
+    bool m_enableImpulseFix;
 }
 
 [[link(android)]]
@@ -14916,6 +14918,7 @@ class PlayerObject : GameObject, AnimatedSpriteDelegate {
     bool m_spiderAnimationEnabled;
     bool m_ignoreDamage;
     bool m_enable22Changes;
+    bool m_enableImpulseFix;
 }
 
 [[link(android), depends(DynamicBitset), depends(SavedActiveObjectState), depends(SavedObjectStateRef), depends(SavedSpecialObjectState)]]
