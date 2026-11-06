@@ -527,6 +527,7 @@ enum class TextStyleType {
     Delayed = 4
 };
 enum class InputValueType {
+    Default = 0,
     Float = 1,
     Int = 2,
     Uint = 3,
@@ -668,43 +669,44 @@ enum class CommentType {
     FriendRequest = 2,
     Multiplayer = 3,
     ListDescription = 4,
-    ListName = 5
+    ListName = 5,
+    EditorSound = 6,
+    ModComment = 7,
+    Note = 8
 };
 
 enum class BoomListType {
     Default = 0x0,
-    User = 0x2,
-    Stats = 0x3,
-    Achievement = 0x4,
-    Level = 0x5,
-    Level2 = 0x6,
-    Comment = 0x7,
-    Comment2 = 0x8,
-    Comment3 = 0x9,
-    List = 0xa,
-    Game = 0xb,
-    Song = 0xc,
-    Score = 0xd,
-    MapPack = 0xe,
-    CustomSong = 0xf,
-    Comment4 = 0x10,
-    User2 = 0x11,
-    Request = 0x12,
-    Message = 0x13,
-    LevelScore = 0x14,
-    Artist = 0x15,
-    SmartTemplate = 0x16,
-    SFX = 0x17,
-    SFX2 = 0x18,
-    CustomMusic = 0x19,
-    Options = 0x1a,
-    LevelList = 0x1b,
-    Level3 = 0x1c,
-    LevelList2 = 0x1d,
-    LevelList3 = 0x1e,
-    Level4 = 0x1f,
-    LocalLevelScore = 0x21,
-    URL = 0x22,
+    Stats = 0x2,
+    Achievement = 0x3,
+    Level = 0x4,
+    Level2 = 0x5,
+    Comment = 0x6,
+    Comment2 = 0x7,
+    Comment3 = 0x8,
+    List = 0x9,
+    Game = 0xa,
+    Song = 0xb,
+    Score = 0xc,
+    MapPack = 0xd,
+    CustomSong = 0xe,
+    Comment4 = 0xf,
+    Request = 0x10,
+    Message = 0x11,
+    LevelScore = 0x12,
+    Artist = 0x13,
+    SmartTemplate = 0x14,
+    SFX = 0x15,
+    SFX2 = 0x16,
+    CustomMusic = 0x17,
+    Options = 0x18,
+    LevelList = 0x19,
+    Level3 = 0x1a,
+    LevelList2 = 0x1b,
+    LevelList3 = 0x1c,
+    Level4 = 0x1d,
+    LocalLevelScore = 0x1f,
+    URL = 0x20,
 };
 
 enum class CurrencySpriteType {
@@ -753,6 +755,8 @@ enum class ZLayer {
     B3 = -1,
     B2 = 1,
     B1 = 3,
+    // The back part of a portal exists on a layer which is behind the player but in front of background objects
+    PortalBack = 4,
     Default = 0,
     T1 = 5,
     T2 = 7,
@@ -1137,6 +1141,261 @@ enum class GameObjectClassType {
     Smart = 5,
 };
 
+// 2.209 Additions
+
+enum class EditorCommand {};
+enum class EditorSoundBrowseMode {};
+enum class EditorSoundInfoKind {};
+enum class AdminDeleteScope {};
+enum class KeybindCaptureMode {
+    Keyboard = 0,
+    Controller = 1,
+};
+enum class AudioViewType {};
+enum class SFXFolderPickerMode {};
+
+// Geode Addition
+// action ids for handleAction. no enum in gd for these, its a plain int, dont
+// swap the signature over to this
+enum class GJActionID {
+    // global, handled by GJKeybindManager::handleGlobalAction
+    MusicVolumeUp = 1001,
+    MusicVolumeDown = 1002,
+    SFXVolumeUp = 1004,
+    SFXVolumeDown = 1005,
+
+    // gameplay, handled by UILayer::handleAction
+    Player1Jump = 10001,
+    Player2Jump = 10002,
+    Player1Left = 10003,
+    Player1Right = 10004,
+    Player2Left = 10005,
+    Player2Right = 10006,
+    PlaceCheckpoint = 10007,
+    DeleteCheckpoint = 10008,
+    Pause = 10009,
+    Retry = 10010,
+    FullReset = 10011,
+    TogglePracticeHitboxes = 10012,
+    TogglePracticeMode = 10013,
+    Reserved14 = 10014,
+    Reserved15 = 10015,
+    StartPosPrev = 10016,
+    StartPosNext = 10017,
+    StartPosNone = 10018,
+    ToggleAutoCheckpoints = 10019,
+    ToggleCheckpoints = 10020,
+    ToggleIgnoreDamage = 10021,
+    // same block, + or - 0.1 depending on the id. unknown float on the game
+    // layer, then calls updateTestModeLabel
+    TestModeIncrease = 10022,
+    TestModeDecrease = 10023,
+    ToggleHitboxOnDeath = 10024,
+    ToggleDeathMarkers = 10025,
+    ToggleGlobalMarkers = 10026,
+    ToggleLocalMarkers = 10027,
+    ToggleMarkerLabels = 10028,
+    Reserved29 = 10029,
+    ToggleLiveMarkers = 10030,
+    ToggleHitboxTrail = 10031,
+    ToggleHitboxTrailOnDeath = 10032,
+
+    // editor, handled by EditorUI::handleAction / handleEditorAction
+    Undo = 20001,
+    Redo = 20002,
+    Copy = 20003,
+    Paste = 20004,
+    Duplicate = 20005,
+    DeselectAll = 20006,
+    SavePos0 = 20007,
+    SavePos1 = 20008,
+    SavePos2 = 20009,
+    SavePos3 = 20010,
+    SavePos4 = 20011,
+    SavePos5 = 20012,
+    SavePos6 = 20013,
+    SavePos7 = 20014,
+    SavePos8 = 20015,
+    SavePos9 = 20016,
+    LoadPos0 = 20017,
+    LoadPos1 = 20018,
+    LoadPos2 = 20019,
+    LoadPos3 = 20020,
+    LoadPos4 = 20021,
+    LoadPos5 = 20022,
+    LoadPos6 = 20023,
+    LoadPos7 = 20024,
+    LoadPos8 = 20025,
+    LoadPos9 = 20026,
+    CreateMode = 20027,
+    EditMode = 20028,
+    DeleteMode = 20029,
+    ViewMode = 20030,
+    ZoomIn = 20031,
+    ZoomOut = 20032,
+    MoveViewUp = 20033,
+    MoveViewDown = 20034,
+    DeleteSelected = 20035,
+    Transform = 20036,
+    FlipX = 20037,
+    FlipY = 20038,
+    RotateCCW = 20039,
+    RotateCW = 20040,
+    MoveLeft = 20041,
+    MoveRight = 20042,
+    MoveUp = 20043,
+    MoveDown = 20044,
+    MoveLeftSmall = 20045,
+    MoveRightSmall = 20046,
+    MoveUpSmall = 20047,
+    MoveDownSmall = 20048,
+    Rotate = 20049,
+    FreeMove = 20050,
+    Swipe = 20051,
+    Snap = 20052,
+    Playback = 20053,
+    PreviewLock = 20054,
+    PreviewUnlock = 20055,
+    PreviewMode = 20056,
+    ParticleIcons = 20057,
+    ShowHitboxes = 20058,
+    HideInvisible = 20059,
+    LinkMode = 20060,
+    TraceIn = 20061,
+    TraceOut = 20062,
+    GroupUp = 20063,
+    GroupDown = 20064,
+    TargetIDUp = 20065,
+    TargetIDDown = 20066,
+    EditorPause = 20067,
+    Playtest = 20068,
+    // acts as a modifier
+    Spacebar = 20069,
+    RotateCCW45 = 20070,
+    RotateCW45 = 20071,
+    RotateSnap = 20072,
+    ShowScale = 20073,
+    ShowScaleXY = 20074,
+    EditObject = 20078,
+    EditGroup = 20079,
+    EditSpecial = 20080,
+    CopyValues = 20081,
+    PasteState = 20082,
+    PasteColor = 20083,
+    GridSizeCycleUp = 20084,
+    GridSizeCycleDown = 20085,
+    SaveLevel = 20086,
+    PausePlaytest = 20087,
+    BuildHelper = 20088,
+    CreateLoop = 20089,
+    DistributeX = 20090,
+    DistributeY = 20091,
+    SelectAll = 20092,
+    SelectAllLeft = 20093,
+    SelectAllRight = 20094,
+    MoveLeftHalf = 20095,
+    MoveRightHalf = 20096,
+    MoveUpHalf = 20097,
+    MoveDownHalf = 20098,
+    MoveLeftQuarter = 20099,
+    MoveRightQuarter = 20100,
+    MoveUpQuarter = 20101,
+    MoveDownQuarter = 20102,
+    MoveLeftTiny = 20103,
+    MoveRightTiny = 20104,
+    MoveUpTiny = 20105,
+    MoveDownTiny = 20106,
+    MoveLeftBig = 20107,
+    MoveRightBig = 20108,
+    MoveUpBig = 20109,
+    MoveDownBig = 20110,
+    PrevBuildTab = 20112,
+    NextBuildTab = 20113,
+    ScrollUp = 20114,
+    ScrollDown = 20115,
+    HideUI = 20116,
+    NextMoveStep = 20117,
+    GridSizeToggle = 20118,
+    OpenCommandMenu = 20119,
+    AlignX = 20120,
+    AlignY = 20121,
+    CreateGradient = 20122,
+    Regroup = 20123,
+    NewGroupX = 20124,
+    NewGroupY = 20125,
+    CopyPlusColor = 20126,
+    PastePlusColor = 20127,
+    CreateExtras = 20128,
+    UnlockLayers = 20129,
+    ResetUnusedColors = 20130,
+    UncheckPortals = 20131,
+    EditColor = 20132,
+    GoToLayer = 20133,
+    GoToBaseLayer = 20134,
+    GoToFreeLayer = 20135,
+    LockLayer = 20136,
+    GroupSticky = 20137,
+    UngroupSticky = 20138,
+    FindObject = 20140,
+    ResetFilter = 20141,
+    DeleteSelectedType = 20142,
+    NewCustomItem = 20143,
+    ExportLevel = 20144,
+    GridSizePlusOne = 20145,
+    GridSizeMinusOne = 20146,
+    WarpLockScale = 20147,
+    WarpOppositeAnchor = 20148,
+    WarpGridSnap = 20149,
+    WarpFreeRotate = 20150,
+    OpenKeybindings = 20151,
+    OpenEditorSFX = 20152,
+    LDM = 20153,
+    PreviewAnims = 20154,
+    PreviewParticles = 20155,
+    PreviewShaders = 20156,
+    ShowGround = 20157,
+    ObjectInfo = 20158,
+    ShowGrid = 20159,
+    SelectFilter = 20160,
+    IgnoreDamage = 20161,
+    EffectLines = 20162,
+    DurationLines = 20163,
+    SongGuidelines = 20164,
+    BPMLines = 20165,
+    KeyframeLines = 20166,
+    LocalDeathMarkers = 20167,
+    GlobalDeathMarkers = 20168,
+    DeathMarkerLabels = 20169,
+    GroupIDFilter = 20170,
+    ColorFilter = 20171,
+    FindNext = 20172,
+    FindPrevious = 20173,
+    MoveLeftSelected = 20174,
+    MoveRightSelected = 20175,
+    MoveUpSelected = 20176,
+    MoveDownSelected = 20177,
+    MoveLeftCustom = 20178,
+    MoveRightCustom = 20179,
+    MoveUpCustom = 20180,
+    MoveDownCustom = 20181,
+    WarpAnchorSnap = 20182,
+    LiveTraceIn = 20183,
+    LiveTraceOut = 20184,
+    CenterOnSelection = 20185,
+    CenterCross = 20186,
+    ObjectOptions = 20187,
+};
+
+// Geode Addition
+// GJKeybindManager::groupForAction, which is just id / 10000
+// used to check keybind conflicts
+// 0 conflicts with all
+enum class GJActionGroup {
+    Global = 0,
+    Gameplay = 1,
+    Editor = 2,
+};
+
 namespace GameVar {
     constexpr auto FollowPlayer = "0001";
     constexpr auto PlaytestMusic = "0002";
@@ -1298,6 +1557,71 @@ namespace GameVar {
     constexpr auto HitboxOnDeath = "0179";
     constexpr auto LinkControlsQuickToggle = "0180";
     constexpr auto StaticTraceArrows = "0181";
+    constexpr auto KeyframeLines = "0182";
+    constexpr auto SpeedhackAudio = "0183";
+    constexpr auto AutoSaveUnk0 = "0185";
+    constexpr auto AutoSaveUnk1 = "0186";
+    constexpr auto AutoSaveUnk2 = "0187";
+    constexpr auto TransformOppositeAnchor = "0188";
+    constexpr auto TransformGridSnap = "0189";
+    constexpr auto TransformFreeRotation = "0190";
+    constexpr auto LegacyMoveMenu = "0191";
+    constexpr auto DisableAutoSavePlatformer = "0192";
+    constexpr auto CustomGridSize = "0193";
+    constexpr auto CustomGridSizeEnabled = "0194";
+    constexpr auto DisableZoomLabel = "0195";
+    constexpr auto DisablePlayerTrail = "0196";
+    constexpr auto DisableWaveTrail = "0197";
+    constexpr auto ResetLevelIntUnk = "0198";
+    constexpr auto DeathTrackerAutoScroll = "0199";
+    constexpr auto DeathMarkersLocal = "0200";
+    constexpr auto DeathMarkersAnimated = "0201";
+    constexpr auto DeathMarkersGlobal = "0202";
+    constexpr auto DisableAutoCreatorControls = "0203";
+    constexpr auto DeathMarkersColoured = "0204";
+    constexpr auto DeathMarkersFrequency = "0205";
+    constexpr auto DeathMarkersSound = "0206";
+    constexpr auto DeathMarkersDisabled = "0207";
+    constexpr auto DeathMarkersLabeled = "0208";
+    constexpr auto EditorLDM = "0209";
+    constexpr auto DeathMarkersLimited = "0210";
+    constexpr auto DeathMarkersTimescale = "0211";
+    constexpr auto SkipDeathTriggers = "0212";
+    constexpr auto HitboxTrailInPractice = "0213";
+    constexpr auto HitboxTrailOnDeath = "0214";
+    constexpr auto HitboxTrailPlaytest = "0215";
+    constexpr auto DeathMarkersLive = "0216";
+    constexpr auto HitboxTrailHighlight = "0217";
+    constexpr auto SafeMode = "0218";
+    constexpr auto OfflineMode = "0219";
+    constexpr auto ParentalControlUnk1 = "0222";
+    constexpr auto ParentalControlUnk2 = "0223";
+    constexpr auto ParentalControlUnk3 = "0224";
+    constexpr auto ParentalControlUnk4 = "0225";
+    constexpr auto ParentalControlUnk5 = "0226";
+    constexpr auto ParentalControlUnk6 = "0227";
+    constexpr auto ParentalControlLock = "0228";
+    constexpr auto TransformLockScale = "0229";
+    constexpr auto FindObjectID = "0230";
+    constexpr auto FindObjectApplyFilters = "0231";
+    constexpr auto FindObjectUnk = "0232";
+    constexpr auto EditorHideCustomSFXName = "0233";
+    constexpr auto NoAutoCheckpointsForStartPos = "0234";
+    constexpr auto HideModButtons = "0235";
+    constexpr auto AutoSaveBackupCap = "0236";
+    constexpr auto NoPlatformerSaveBackup = "0237";
+    constexpr auto EditorMoveStep = "0238";
+    constexpr auto NotificationsMask = "0239";
+    constexpr auto PublicAlerts = "0240";
+    constexpr auto HasSyncedFollowing = "0241";
+    constexpr auto DisableAnchorSnap = "0242";
+    constexpr auto DisableMessaging = "0243";
+    constexpr auto ParentalControlUnk7 = "0244";
+    constexpr auto DisablePinch = "0245";
+    constexpr auto MessagingRulesAgreed = "0246";
+    constexpr auto UseLegacyMove = "0247";
+    constexpr auto HideCenterCross = "0248";
+    constexpr auto LegacyPauseProgress = "0249";
 }
 
 // frozen archaic versions of enums

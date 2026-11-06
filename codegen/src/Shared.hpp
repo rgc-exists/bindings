@@ -1,10 +1,11 @@
 #pragma once
 
-#include <array>
-#include <unordered_set>
 #include <broma.hpp>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
+#include <array>
+#include <unordered_set>
+#include <map>
 #include <fstream>
 #include <filesystem>
 
@@ -78,6 +79,10 @@ inline bool is_cocos_or_fmod_class(std::string const& str) {
     return is_cocos_class(str) || is_fmod_class(str);
 }
 
+inline bool is_kazmath_func(std::string const& str) {
+    return str.starts_with("km");
+}
+
 enum class BindStatus {
     Binded,
     Inlined,
@@ -99,7 +104,7 @@ namespace codegen {
         for (auto& f : root.functions) {
             idMap[&f] = id++;
         }
-        
+
         for (auto& c : root.classes) {
             for (auto& f : c.fields) {
                 if (auto fn = f.get_as<FunctionBindField>()) {
@@ -214,12 +219,26 @@ namespace codegen {
         return 0;
     }
 
+    inline std::vector<std::string> getSuperclassesWithPlatform(Platform p, Class const& c) {
+        std::vector<std::string> ret;
+        for (auto& s : c.superclasses) {
+            if ((s.platform & p) == p) {
+                ret.push_back(s.name);
+            }
+        }
+        return ret;
+    }
+
+    inline std::vector<std::string> getSuperclasses(Class const& c) {
+        return getSuperclassesWithPlatform(codegen::platform, c);
+    }
+
     inline BindStatus getStatusWithPlatform(Platform p, FunctionBindField const& fn) {
         if (
             codegen::sdkVersion < fn.prototype.attributes.since ||
             (fn.prototype.attributes.missing & p) != Platform::None
         ) return BindStatus::Missing;
-        
+
         if (platformNumberWithPlatform(p, fn.binds) == -2) return BindStatus::Inlined;
 
         if ((fn.prototype.attributes.links & p) != Platform::None) {
@@ -230,7 +249,7 @@ namespace codegen {
                     if (can_find(type.name, "gd::")) return BindStatus::NeedsRebinding;
                 }
             }
-            
+
             return BindStatus::Binded;
         }
 
@@ -344,10 +363,26 @@ namespace codegen {
         return std::string("tulip::hook::") + getModifyConventionName(f) + "Convention";
     }
 
+    inline std::string getNamespaceName(std::string const& s) {
+        auto index = s.rfind("::");
+        if (index == std::string::npos) return "";
+        return s.substr(0, index);
+    }
+
     inline std::string getUnqualifiedClassName(std::string const& s) {
         auto index = s.rfind("::");
-        if (index == std::string::npos) return s;
-        return s.substr(index + 2);
+        auto index2 = s.find("<");
+        if (index == std::string::npos) return s.substr(0, index2);
+        return s.substr(index + 2, index2 - (index + 2));
+    }
+
+    inline std::string getClassIncludeString(std::string const& s) {
+        if (is_cocos_or_fmod_class(s))  {
+            return "#include <Geode/mapping/" + codegen::getUnqualifiedClassName(s) + ".hpp>";
+        }
+        else {
+            return "#include <Geode/binding/" + codegen::getUnqualifiedClassName(s) + ".hpp>";
+        }
     }
 
     inline std::string getIncludes(Root const& root) {

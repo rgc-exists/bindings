@@ -12347,7 +12347,7 @@ class GameObject : CCSpritePlus {
     float m_areaOpacityValue;
     int m_areaOpacityIndex;
     int m_unk52C;
-    bool m_unk530;
+    bool m_hasDynamicallySaved; // m_unk530
     bool m_isUIObject;
     bool m_greenDebugDraw;
 }
@@ -16361,7 +16361,7 @@ class GJDropDownLayerDelegate {
     virtual void dropDownLayerWillClose(GJDropDownLayer* layer) {}
 }
 
-[[link(android), depends(DynamicMoveCalculation), depends(PulseEffectAction), depends(TouchToggleAction), depends(CollisionTriggerAction), depends(ToggleTriggerAction), depends(SpawnTriggerAction), depends(GroupCommandObject2), depends(OpacityEffectAction), depends(CountTriggerAction), depends(TimerItem), depends(TimerTriggerAction)]]
+[[link(android), depends(DynamicMoveCalculation), depends(EffectManagerState), depends(PulseEffectAction), depends(TouchToggleAction), depends(CollisionTriggerAction), depends(ToggleTriggerAction), depends(SpawnTriggerAction), depends(GroupCommandObject2), depends(OpacityEffectAction), depends(CountTriggerAction), depends(TimerItem), depends(TimerTriggerAction)]]
 class GJEffectManager : cocos2d::CCNode {
     // virtual ~GJEffectManager();
     // GJEffectManager();
@@ -22953,7 +22953,7 @@ class LevelEditorLayer : GJBaseGameLayer, LevelSettingsDelegate {
     }
     cocos2d::CCPoint getSelectedEffectPos() = win inline, m1 0xd2bcc, imac 0xed410, ios 0x360000 {
         if (!m_playbackObject) return cocos2d::CCPoint { 0.f, 0.f };
-        if (m_playbackObject->m_objectID != 1816) return m_playbackObject->m_speedStart;
+        if (m_playbackObject->m_objectID != 31) return m_playbackObject->m_speedStart;
         return m_playbackObject->getRealPosition();
     }
     int getSelectedOrderChannel() = win inline, m1 0xd2b5c, imac 0xed390, ios 0x35ff98 {
@@ -27650,7 +27650,7 @@ class PlayerObject : GameObject, AnimatedSpriteDelegate {
                 m_stateHitHead = 2;
                 break;
             }
-            case 2069: case 3845: {
+            case 2069: case 3645: {
                 m_stateForce = 2;
                 auto forceObject = static_cast<ForceBlockGameObject*>(object);
                 auto forceID = forceObject->m_forceID;
@@ -30383,7 +30383,7 @@ class SelectSFXSortLayer : FLAlertLayer {
     SelectSFXSortDelegate* m_delegate;
 }
 
-[[link(android)]]
+[[link(android), depends(SequenceTriggerState)]]
 class SequenceTriggerGameObject : ChanceTriggerGameObject {
     // virtual ~SequenceTriggerGameObject();
     SequenceTriggerGameObject() {

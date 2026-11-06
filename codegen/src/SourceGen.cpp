@@ -3,10 +3,10 @@
 namespace { namespace format_strings {
 	constexpr char const* source_start = R"GEN(
 #include <stdexcept>
-#include <Geode/Bindings.hpp>
 #include <Geode/utils/addresser.hpp>
 #include <Geode/modify/Traits.hpp>
 #include <Geode/loader/Tulip.hpp>
+{class_include}
 {includes}
 using namespace geode;
 using namespace geode::modifier;
@@ -106,6 +106,12 @@ auto {class_name}::{function_name}({parameters}){const} -> decltype({function_na
 }}
 )GEN";
 
+	constexpr char const* declare_unimplemented_constr_destr_error = R"GEN(
+{class_name}::{function_name}({parameters}){const} {{
+	throw std::runtime_error("{class_name}::{function_name} not implemented");
+}}
+)GEN";
+
 	constexpr char const* declare_unimplemented_error = R"GEN(
 auto {class_name}::{function_name}({parameters}){const} -> decltype({function_name}({arguments})) {{
 	throw std::runtime_error("{class_name}::{function_name} not implemented");
@@ -125,7 +131,7 @@ auto {class_name}::{function_name}({parameters}){const} -> decltype({function_na
 )GEN";
 
 	constexpr char const* declare_standalone = R"GEN(
-{return} {function_name}({parameters}) {{
+{extern_def}{return} {function_name}({parameters}) {{
 	using FunctionType = decltype({function_name}({arguments}))(*)({parameter_types});
 	static auto func = wrapFunction<FunctionType>({address_inline}, tulip::hook::TulipConvention::{convention});
 	return reinterpret_cast<FunctionType>(func)({arguments});
@@ -138,12 +144,14 @@ auto {class_name}::{function_name}({parameters}){const} -> decltype({function_na
 }}
 
 bool areSuperclassesEmpty(Class const& c) {
-	return c.superclasses.empty() || (c.superclasses.size() == 1 && c.superclasses[0].find("CCCopying") != std::string::npos);
+    auto superclasses = codegen::getSuperclasses(c);
+	return superclasses.empty() || (superclasses.size() == 1 && superclasses[0].find("CCCopying") != std::string::npos);
 }
 
 std::string generateBindingSource(Root const& root, std::filesystem::path const& singleFolder, bool skipPugixml, bool skipInlines, std::unordered_set<std::string>* generatedFiles) {
 	std::string output = fmt::format(format_strings::source_start,
-		fmt::arg("includes", codegen::getIncludes(root))
+		fmt::arg("includes", codegen::getIncludes(root)),
+		fmt::arg("class_include", "#include <Geode/binding/Standalones.hpp>\n")
 	);
 
 	for (auto& f : root.functions) {
@@ -167,7 +175,8 @@ std::string generateBindingSource(Root const& root, std::filesystem::path const&
 			fmt::arg("parameters", codegen::getParameters(f.prototype)),
 			fmt::arg("parameter_types", codegen::getParameterTypes(f.prototype)),
 			fmt::arg("arguments", codegen::getParameterNames(f.prototype)),
-			fmt::arg("parameter_comma", str_if(", ", !f.prototype.args.empty()))
+			fmt::arg("parameter_comma", str_if(", ", !f.prototype.args.empty())),
+            fmt::arg("extern_def", str_if("extern \"C\" ", is_kazmath_func(f.prototype.name)))
 		);
     }
 
@@ -178,7 +187,8 @@ std::string generateBindingSource(Root const& root, std::filesystem::path const&
 			}
 		}
 		std::string output = fmt::format(format_strings::source_start,
-			fmt::arg("includes", codegen::getIncludes(root))
+			fmt::arg("includes", codegen::getIncludes(root)),
+			fmt::arg("class_include", codegen::getClassIncludeString(c.name))
 		);
 
 		std::string filename = (codegen::getUnqualifiedClassName(c.name) + ".cpp");
@@ -234,7 +244,15 @@ std::string generateBindingSource(Root const& root, std::filesystem::path const&
 					char const* used_declare_format = nullptr;
 
 					if (codegen::platformNumber(fn->binds) == 0x9999999) {
-						used_declare_format = format_strings::declare_unimplemented_error;
+						switch (fn->prototype.type) {
+							case FunctionType::Normal:
+								used_declare_format = format_strings::declare_unimplemented_error;
+								break;
+							case FunctionType::Ctor:
+							case FunctionType::Dtor:
+								used_declare_format = format_strings::declare_unimplemented_constr_destr_error;
+								break;
+						}
 					}
 					else if (codegen::getStatus(*fn) != BindStatus::NeedsBinding && codegen::getStatus(*fn) != BindStatus::NeedsRebinding) {
 						continue;
